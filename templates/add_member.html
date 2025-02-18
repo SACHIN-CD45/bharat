@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+
+{% block title %}Add Member - {{ current_user.user_data.gym_name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">Add New Member</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('add_member') }}" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="name" class="form-label">Full Name</label>
+                                    <input type="text" class="form-control" id="name" name="name" 
+                                           required pattern="[A-Za-z\s]+" minlength="2" maxlength="50"
+                                           title="Please enter a valid name (letters and spaces only)">
+                                    <div class="invalid-feedback">
+                                        Please enter a valid name using only letters and spaces.
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email" name="email" 
+                                           required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+                                           title="Please enter a valid email address">
+                                    <div class="invalid-feedback">
+                                        Please enter a valid email address.
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="phone" class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-control" id="phone" name="phone" 
+                                           required pattern="[0-9]{10}"
+                                           title="Please enter a valid 10-digit phone number"
+                                           oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                                    <div class="invalid-feedback">
+                                        Please enter a valid 10-digit phone number.
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="address" class="form-label">Address</label>
+                                    <textarea class="form-control" id="address" name="address" 
+                                              required minlength="10" maxlength="200" rows="2"
+                                              title="Please enter a valid address (minimum 10 characters)"></textarea>
+                                    <div class="invalid-feedback">
+                                        Please enter a valid address (minimum 10 characters).
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="duration" class="form-label">Membership Duration</label>
+                                    <select class="form-select" id="duration" name="duration" required>
+                                        <option value="1">1 Month</option>
+                                        <option value="3">3 Months</option>
+                                        <option value="6">6 Months</option>
+                                        <option value="12">12 Months</option>
+                                        <option value="1">1 Month PT</option>
+                                        <option value="3">3 Months PT</option>
+                                        <option value="6">6 Months PT</option>
+                                        <option value="12">12 Months PT</option>
+                                    </select>
+                                </div>    
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="fee" class="form-label">Membership Fee</label>
+                                    <input type="number" class="form-control" id="fee" name="fee" 
+                                           required min="1" step="1"
+                                           title="Please enter a valid fee amount (minimum $1)">
+                                    <div class="invalid-feedback">
+                                        Please enter a valid fee amount (minimum 1200).
+                                    </div>
+                                </div>
+
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Member Photo</label>
+                                    <div class="camera-container">
+                                        <video id="video" width="320" height="240" class="mb-2 d-none"></video>
+                                        <canvas id="canvas" width="320" height="240" class="mb-2 d-none"></canvas>
+                                        <img id="photo-preview" class="mb-2 d-none" width="320" height="240">
+                                        <div class="d-flex gap-2">
+                                            <button type="button" id="start-camera" class="btn btn-primary">Start Camera</button>
+                                            <button type="button" id="capture-photo" class="btn btn-success d-none">Take Photo</button>
+                                            <button type="button" id="retake-photo" class="btn btn-warning d-none">Retake</button>
+                                        </div>
+                                        <input type="hidden" name="photo" id="photo-data">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary">Add Member</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Form validation
+(function () {
+    'use strict'
+    
+    // Fetch all forms we want to apply validation to
+    const forms = document.querySelectorAll('.needs-validation')
+    
+    // Add validation on form submission
+    Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+            form.classList.add('was-validated')
+        }, false)
+    })
+    
+    // Phone number validation
+    const phoneInput = document.getElementById('phone');
+    phoneInput.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        if (value.length > 10) {
+            value = value.slice(0, 10);
+        }
+        e.target.value = value;
+        
+        // Update validation state
+        if (value.length === 10) {
+            phoneInput.setCustomValidity('');
+        } else {
+            phoneInput.setCustomValidity('Please enter a valid 10-digit phone number');
+        }
+    });
+    
+    // Email validation
+    const emailInput = document.getElementById('email');
+    emailInput.addEventListener('input', function(e) {
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if (emailRegex.test(e.target.value)) {
+            emailInput.setCustomValidity('');
+        } else {
+            emailInput.setCustomValidity('Please enter a valid email address');
+        }
+    });
+    
+    // Address validation
+    const addressInput = document.getElementById('address');
+    addressInput.addEventListener('input', function(e) {
+        if (e.target.value.length >= 10) {
+            addressInput.setCustomValidity('');
+        } else {
+            addressInput.setCustomValidity('Address must be at least 10 characters long');
+        }
+    });
+})();
+
+// Camera functionality
+let video = document.getElementById('video');
+let canvas = document.getElementById('canvas');
+let startButton = document.getElementById('start-camera');
+let captureButton = document.getElementById('capture-photo');
+let retakeButton = document.getElementById('retake-photo');
+let photoPreview = document.getElementById('photo-preview');
+let photoData = document.getElementById('photo-data');
+let stream = null;
+
+startButton.addEventListener('click', async () => {
+    try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = stream;
+        video.play();
+        
+        video.classList.remove('d-none');
+        captureButton.classList.remove('d-none');
+        startButton.classList.add('d-none');
+        photoPreview.classList.add('d-none');
+    } catch (err) {
+        console.error('Error accessing camera:', err);
+        alert('Could not access camera. Please make sure you have granted camera permissions.');
+    }
+});
+
+captureButton.addEventListener('click', () => {
+    canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+    const photoDataUrl = canvas.toDataURL('image/jpeg');
+    
+    photoPreview.src = photoDataUrl;
+    photoData.value = photoDataUrl;
+    
+    video.classList.add('d-none');
+    photoPreview.classList.remove('d-none');
+    captureButton.classList.add('d-none');
+    retakeButton.classList.remove('d-none');
+    
+    if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+    }
+});
+
+retakeButton.addEventListener('click', async () => {
+    try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = stream;
+        video.play();
+        
+        video.classList.remove('d-none');
+        captureButton.classList.remove('d-none');
+        retakeButton.classList.add('d-none');
+        photoPreview.classList.add('d-none');
+    } catch (err) {
+        console.error('Error accessing camera:', err);
+        alert('Could not access camera. Please make sure you have granted camera permissions.');
+    }
+});
+</script>
+{% endblock %}

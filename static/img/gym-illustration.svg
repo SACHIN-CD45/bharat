@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background -->
+    <rect width="800" height="600" fill="#f8f9fa"/>
+    
+    <!-- Dumbbell -->
+    <g transform="translate(200,200)">
+        <!-- Left Weight -->
+        <rect x="0" y="80" width="60" height="140" rx="10" fill="#3498db"/>
+        
+        <!-- Bar -->
+        <rect x="60" y="130" width="280" height="40" rx="5" fill="#2c3e50"/>
+        
+        <!-- Right Weight -->
+        <rect x="340" y="80" width="60" height="140" rx="10" fill="#3498db"/>
+        
+        <!-- Weight Plates Left -->
+        <rect x="70" y="100" width="10" height="100" rx="2" fill="#3498db"/>
+        <rect x="90" y="100" width="10" height="100" rx="2" fill="#3498db"/>
+        
+        <!-- Weight Plates Right -->
+        <rect x="300" y="100" width="10" height="100" rx="2" fill="#3498db"/>
+        <rect x="320" y="100" width="10" height="100" rx="2" fill="#3498db"/>
+    </g>
+    
+    <!-- Decorative Elements -->
+    <circle cx="150" cy="450" r="40" fill="#3498db" opacity="0.1"/>
+    <circle cx="650" cy="150" r="60" fill="#3498db" opacity="0.1"/>
+    <circle cx="700" cy="500" r="30" fill="#3498db" opacity="0.1"/>
+    
+    <!-- Text Elements -->
+    <text x="400" y="500" font-family="Arial" font-size="24" fill="#2c3e50" text-anchor="middle">
+        Gym Management System
+    </text>
+</svg>

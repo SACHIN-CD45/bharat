@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block title %}Sign Up - Gym Management System{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">Create Your Gym Account</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('signup') }}" enctype="multipart/form-data">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="gym_name" class="form-label">Gym Name</label>
+                                    <input type="text" class="form-control" id="gym_name" name="gym_name" required>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="name" class="form-label">Your Name</label>
+                                    <input type="text" class="form-control" id="name" name="name" required>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email" name="email" required>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="password" class="form-label">Password</label>
+                                    <input type="password" class="form-control" id="password" name="password" required>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Profile Photo</label>
+                                    <div class="camera-container">
+                                        <video id="video" width="320" height="240" class="mb-2 d-none"></video>
+                                        <canvas id="canvas" width="320" height="240" class="mb-2 d-none"></canvas>
+                                        <img id="photo-preview" class="mb-2 d-none" width="320" height="240">
+                                        <div class="d-flex gap-2">
+                                            <button type="button" id="start-camera" class="btn btn-primary">
+                                                <i class="fas fa-camera me-2"></i>Take Photo
+                                            </button>
+                                            <button type="button" id="capture-photo" class="btn btn-success d-none">
+                                                <i class="fas fa-camera-retro me-2"></i>Capture
+                                            </button>
+                                            <button type="button" id="retake-photo" class="btn btn-warning d-none">
+                                                <i class="fas fa-redo me-2"></i>Retake
+                                            </button>
+                                        </div>
+                                        <input type="hidden" name="photo" id="photo-data">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-end mt-3">
+                            <a href="{{ url_for('login') }}" class="btn btn-light me-2">Already have an account?</a>
+                            <button type="submit" class="btn btn-primary">Create Account</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let video = document.getElementById('video');
+let canvas = document.getElementById('canvas');
+let startButton = document.getElementById('start-camera');
+let captureButton = document.getElementById('capture-photo');
+let retakeButton = document.getElementById('retake-photo');
+let photoPreview = document.getElementById('photo-preview');
+let photoData = document.getElementById('photo-data');
+let stream = null;
+
+startButton.addEventListener('click', async () => {
+    try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = stream;
+        video.play();
+        
+        video.classList.remove('d-none');
+        captureButton.classList.remove('d-none');
+        startButton.classList.add('d-none');
+        photoPreview.classList.add('d-none');
+    } catch (err) {
+        console.error('Error accessing camera:', err);
+        alert('Could not access camera. Please make sure you have granted camera permissions.');
+    }
+});
+
+captureButton.addEventListener('click', () => {
+    canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+    const photoDataUrl = canvas.toDataURL('image/jpeg');
+    
+    photoPreview.src = photoDataUrl;
+    photoData.value = photoDataUrl;
+    
+    video.classList.add('d-none');
+    photoPreview.classList.remove('d-none');
+    captureButton.classList.add('d-none');
+    retakeButton.classList.remove('d-none');
+    
+    if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+    }
+});
+
+retakeButton.addEventListener('click', async () => {
+    try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = stream;
+        video.play();
+        
+        video.classList.remove('d-none');
+        captureButton.classList.remove('d-none');
+        retakeButton.classList.add('d-none');
+        photoPreview.classList.add('d-none');
+    } catch (err) {
+        console.error('Error accessing camera:', err);
+        alert('Could not access camera. Please make sure you have granted camera permissions.');
+    }
+});
+</script>
+{% endblock %}

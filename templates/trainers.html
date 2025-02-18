@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Trainers - {{ current_user.user_data.gym_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Personal Trainers</h2>
+        <a href="{{ url_for('add_trainer') }}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Add Trainer
+        </a>
+    </div>
+
+    <div class="row">
+        {% for trainer in trainers %}
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="rounded-circle bg-primary bg-opacity-10 p-3 me-3">
+                            <i class="fas fa-user-tie text-primary"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-1">{{ trainer.name }}</h5>
+                            <p class="text-muted mb-0">{{ trainer.specialization }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="fas fa-envelope text-muted me-2"></i>
+                            <span>{{ trainer.email }}</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-phone text-muted me-2"></i>
+                            <span>{{ trainer.phone }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('update_trainer', trainer_id=trainer._id) }}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-edit me-2"></i>Update
+                        </a>
+                        <a href="mailto:{{ trainer.email }}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-envelope me-2"></i>Contact
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>No trainers added yet. Add your first trainer to get started!
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

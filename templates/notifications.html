@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Notifications - {{ current_user.user_data.gym_name }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h5 class="mb-0">Notifications</h5>
+        </div>
+        <div class="card-body">
+            <div class="notifications-list">
+                {% if notifications %}
+                    {% for notification in notifications %}
+                    <div class="notification-item {% if not notification.is_read %}unread{% endif %}"
+                         data-id="{{ notification._id }}">
+                        <div class="notification-content">
+                            {{ notification.message }}
+                            <small class="text-muted d-block">
+                                {{ notification.created_at|format_date }}
+                            </small>
+                        </div>
+                        {% if not notification.is_read %}
+                        <button class="btn btn-sm btn-light mark-read" 
+                                onclick="markNotificationRead('{{ notification._id }}')">
+                            <i class="fas fa-check"></i>
+                        </button>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-bell-slash fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">No notifications to display</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function markNotificationRead(notificationId) {
+    fetch(`/mark_notification_read/${notificationId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const notification = document.querySelector(`[data-id="${notificationId}"]`);
+                notification.classList.remove('unread');
+                const markReadBtn = notification.querySelector('.mark-read');
+                if (markReadBtn) {
+                    markReadBtn.remove();
+                }
+                updateNotificationCount();
+            }
+        });
+}
+
+function updateNotificationCount() {
+    fetch('/api/notifications/unread/count')
+        .then(response => response.json())
+        .then(data => {
+            const badge = document.getElementById('notification-count');
+            if (badge) {
+                if (data.count > 0) {
+                    badge.textContent = data.count;
+                    badge.style.display = 'inline';
+                } else {
+                    badge.style.display = 'none';
+                }
+            }
+        });
+}
+
+// Update notification count every minute
+setInterval(updateNotificationCount, 60000);
+updateNotificationCount();
+</script>
+{% endblock %}

@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+
+{% block title %}{{ member.get('name', 'Member Details') }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body text-center">
+                    {% if member.get('photo') %}
+                    <img src="{{ url_for('static', filename='uploads/' + member.get('photo')) }}" 
+                         class="rounded-circle mb-3" 
+                         style="width: 150px; height: 150px; object-fit: cover;"
+                         alt="{{ member.get('name', 'Member') }}">
+                    {% else %}
+                    <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center mx-auto mb-3"
+                         style="width: 150px; height: 150px;">
+                        <i class="fas fa-user fa-4x text-white"></i>
+                    </div>
+                    {% endif %}
+                    <h4 class="mb-1">{{ member.get('name', 'Member') }}</h4>
+                    <p class="text-muted mb-3">Member since {{ member.get('join_date')|format_date }}</p>
+                    
+                    <div class="mb-3">
+                        {% if status == 'Active' %}
+                            <span class="badge bg-success">Active Member</span>
+                        {% elif status == 'Expiring Soon' %}
+                            <span class="badge bg-warning">Expiring in {{ days_left }} days</span>
+                        {% else %}
+                            <span class="badge bg-danger">Membership Expired</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('update_member', member_id=member._id) }}" class="btn btn-primary">
+                            <i class="fas fa-edit me-2"></i>Update Member
+                        </a>
+                        {% if member.get('email') %}
+                        <a href="mailto:{{ member.get('email') }}" class="btn btn-outline-primary">
+                            <i class="fas fa-envelope me-2"></i>Send Email
+                        </a>
+                        {% endif %}
+                        {% if member.get('phone') %}
+                        <a href="tel:{{ member.get('phone') }}" class="btn btn-outline-primary">
+                            <i class="fas fa-phone me-2"></i>Call
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <!-- Personal Information -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Personal Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">Email</label>
+                            <p class="mb-0">{{ member.get('email', 'Not provided') }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">Phone</label>
+                            <p class="mb-0">{{ member.get('phone', 'Not provided') }}</p>
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label class="form-label text-muted">Address</label>
+                            <p class="mb-0">{{ member.get('address', 'Not provided') }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Membership Details -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Membership Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">Start Date</label>
+                            <p class="mb-0">{{ member.get('membership_start')|format_date }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">End Date</label>
+                            <p class="mb-0">{{ member.get('membership_end')|format_date }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">Duration</label>
+                            <p class="mb-0">{{ member.get('membership_duration', 'Not specified') }} months</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">Status</label>
+                            <div>
+                                {% if status == 'Active' %}
+                                    <span class="badge bg-success">Active</span>
+                                {% elif status == 'Expiring Soon' %}
+                                    <span class="badge bg-warning">Expiring Soon</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Expired</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Health Information -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Health Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">Weight</label>
+                            <p class="mb-0">{{ member.get('weight', 'Not provided') }} {% if member.get('weight') %}kg{% endif %}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">Height</label>
+                            <p class="mb-0">{{ member.get('height', 'Not provided') }} {% if member.get('height') %}cm{% endif %}</p>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label text-muted">Health Conditions</label>
+                            <p class="mb-0">{{ member.get('health_conditions', 'None specified') }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Personal Training -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Personal Training</h5>
+                </div>
+                <div class="card-body">
+                    {% if member.get('needs_pt') %}
+                        {% if trainer %}
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-muted">Trainer</label>
+                                <p class="mb-0">{{ trainer.get('name', 'Not specified') }}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-muted">Sessions per Week</label>
+                                <p class="mb-0">{{ member.get('pt_sessions', 'Not specified') }} {% if member.get('pt_sessions') %}session(s){% endif %}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-muted">Trainer Contact</label>
+                                <p class="mb-0">{{ trainer.get('phone', 'Not provided') }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-muted">Specialization</label>
+                                <p class="mb-0">{{ trainer.get('specialization', 'Not specified') }}</p>
+                            </div>
+                        </div>
+                        {% else %}
+                        <p class="text-warning mb-0">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Trainer assignment pending
+                        </p>
+                        {% endif %}
+                    {% else %}
+                    <p class="text-muted mb-0">No personal training assigned</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Emergency Contact -->
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0">Emergency Contact</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">Name</label>
+                            <p class="mb-0">{{ member.get('emergency_contact_name', 'Not provided') }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">Phone</label>
+                            <p class="mb-0">{{ member.get('emergency_contact_phone', 'Not provided') }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
