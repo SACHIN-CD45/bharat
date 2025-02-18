@@ -62,54 +62,56 @@
     --sidebar-icon: #d1d5db;   /* Light gray icons */
 }
 
-/* Primary Colors */
---primary-color: #3182ce;
---primary-dark: #2c5282;
---primary-light: #ebf8ff;
+:root {
+    /* Primary Colors */
+    --primary-color: #3182ce;
+    --primary-dark: #2c5282;
+    --primary-light: #ebf8ff;
 
-/* Secondary Colors */
---secondary-color: #4a5568;
---secondary-dark: #2d3748;
---secondary-light: #e2e8f0;
+    /* Secondary Colors */
+    --secondary-color: #4a5568;
+    --secondary-dark: #2d3748;
+    --secondary-light: #e2e8f0;
 
-/* Success Colors */
---success-color: #38a169;
---success-dark: #2f855a;
---success-light: #f0fff4;
+    /* Success Colors */
+    --success-color: #38a169;
+    --success-dark: #2f855a;
+    --success-light: #f0fff4;
 
-/* Danger Colors */
---danger-color: #e53e3e;
---danger-dark: #c53030;
---danger-light: #fff5f5;
+    /* Danger Colors */
+    --danger-color: #e53e3e;
+    --danger-dark: #c53030;
+    --danger-light: #fff5f5;
 
-/* Warning Colors */
---warning-color: #d69e2e;
---warning-dark: #b7791f;
---warning-light: #fffff0;
+    /* Warning Colors */
+    --warning-color: #d69e2e;
+    --warning-dark: #b7791f;
+    --warning-light: #fffff0;
 
-/* Info Colors */
---info-color: #4299e1;
---info-dark: #3182ce;
---info-light: #ebf8ff;
+    /* Info Colors */
+    --info-color: #4299e1;
+    --info-dark: #3182ce;
+    --info-light: #ebf8ff;
 
-/* Neutral Colors */
---gray-100: #f7fafc;
---gray-200: #edf2f7;
---gray-300: #e2e8f0;
---gray-400: #cbd5e0;
---gray-500: #a0aec0;
---gray-600: #718096;
---gray-700: #4a5568;
---gray-800: #2d3748;
---gray-900: #1a202c;
+    /* Neutral Colors */
+    --gray-100: #f7fafc;
+    --gray-200: #edf2f7;
+    --gray-300: #e2e8f0;
+    --gray-400: #cbd5e0;
+    --gray-500: #a0aec0;
+    --gray-600: #718096;
+    --gray-700: #4a5568;
+    --gray-800: #2d3748;
+    --gray-900: #1a202c;
 
-/* Layout */
---sidebar-width: 250px;
---sidebar-collapsed-width: 0px;
---header-height: 60px;
---border-radius: 0.5rem;
---card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
---transition-base: all 0.2s ease;
+    /* Layout */
+    --sidebar-width: 250px;
+    --sidebar-collapsed-width: 0px;
+    --header-height: 60px;
+    --border-radius: 0.5rem;
+    --card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    --transition-base: all 0.2s ease;
+}
 
 /* Dark Mode Colors */
 [data-theme="dark"] {
