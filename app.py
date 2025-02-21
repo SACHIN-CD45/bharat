@@ -5,7 +5,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from bson.objectid import ObjectId
 from datetime import datetime, timedelta
 import os
-import cv2
 from PIL import Image
 import base64
 import io
