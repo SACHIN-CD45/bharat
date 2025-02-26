@@ -6,7 +6,7 @@ let currentStream = null;
 
 // DOM Elements
 const searchInput = document.getElementById('member-search');
-const searchResults = document.getElementById('search-results');
+const memberSearchResults = document.getElementById('search-results');
 const notificationBadge = document.getElementById('notification-badge');
 const notificationsList = document.getElementById('notifications-list');
 
@@ -29,8 +29,8 @@ if (searchInput) {
         }
         
         if (query.length < 2) {
-            searchResults.innerHTML = '';
-            searchResults.classList.add('d-none');
+            memberSearchResults.innerHTML = '';
+            memberSearchResults.classList.add('d-none');
             return;
         }
         
@@ -38,10 +38,10 @@ if (searchInput) {
             fetch(`/api/search_members?query=${encodeURIComponent(query)}`)
                 .then(response => response.json())
                 .then(data => {
-                    searchResults.innerHTML = '';
-                    
+                    memberSearchResults.innerHTML = '';
+                            
                     if (data.members.length === 0) {
-                        searchResults.innerHTML = `
+                        memberSearchResults.innerHTML = `
                             <div class="p-3 text-center text-muted">
                                 <i class="fas fa-search mb-2"></i>
                                 <p class="mb-0">No members found</p>
@@ -70,11 +70,11 @@ if (searchInput) {
                             memberElement.addEventListener('click', () => {
                                 window.location.href = `/member/${member._id}`;
                             });
-                            searchResults.appendChild(memberElement);
+                            memberSearchResults.appendChild(memberElement);
                         });
                     }
                     
-                    searchResults.classList.remove('d-none');
+                    memberSearchResults.classList.remove('d-none');
                 })
                 .catch(error => {
                     console.error('Error searching members:', error);
@@ -84,8 +84,8 @@ if (searchInput) {
     
     // Hide search results when clicking outside
     document.addEventListener('click', function(e) {
-        if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
-            searchResults.classList.add('d-none');
+        if (!searchInput.contains(e.target) && !memberSearchResults.contains(e.target)) {
+            memberSearchResults.classList.add('d-none');
         }
     });
 }
@@ -205,3 +205,103 @@ window.addEventListener('beforeunload', function() {
         currentStream.getTracks().forEach(track => track.stop());
     }
 });
+
+const searchInputs = document.querySelectorAll('.search-input');
+const searchResults = document.querySelectorAll('.search-results');
+
+searchInputs.forEach(input => {
+    input.addEventListener('input', function(e) {
+        clearTimeout(searchTimeout);
+        const query = e.target.value.trim();
+        
+        if (query.length < 1) {
+            searchResults.forEach(result => {
+                result.innerHTML = '';
+                result.classList.remove('show');
+            });
+            return;
+        }
+
+        // Show loading state
+        searchResults.forEach(result => {
+            result.innerHTML = '<div class="search-result-empty">Searching...</div>';
+            result.classList.add('show');
+        });
+
+        searchTimeout = setTimeout(() => {
+            fetch(`/search?query=${encodeURIComponent(query)}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Search request failed');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.length > 0) {
+                        const html = data.map(item => `
+                            <a href="${item.url}" class="search-result-item">
+                                <div class="d-flex align-items-center">
+                                    <div class="search-result-icon ${item.type === 'Member' ? 'bg-primary' : 'bg-success'}">
+                                        <i class="fas ${item.type === 'Member' ? 'fa-user' : 'fa-dumbbell'}"></i>
+                                    </div>
+                                    <div class="search-result-info">
+                                        <div class="search-result-name">${item.name}</div>
+                                        <div class="search-result-details">
+                                            ${item.type === 'Member' ? 
+                                                `<span class="badge ${item.status === 'Active' ? 'bg-success' : 'bg-danger'}">${item.status}</span>` :
+                                                `<span class="badge bg-info">${item.specialization || 'Trainer'}</span>`
+                                            }
+                                            <small class="text-muted">${item.phone}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        `).join('');
+                        searchResults.forEach(result => {
+                            result.innerHTML = html;
+                        });
+                    } else {
+                        searchResults.forEach(result => {
+                            result.innerHTML = '<div class="search-result-empty">No results found</div>';
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Search error:', error);
+                    searchResults.forEach(result => {
+                        result.innerHTML = '<div class="search-result-empty text-danger">Error performing search</div>';
+                    });
+                });
+        }, 300);
+    });
+});
+
+// Hide search results when clicking outside
+document.addEventListener('click', function(e) {
+    searchInput.forEach(input => {
+        searchResults.forEach(result => {
+            if (!input.contains(e.target) && !result.contains(e.target)) {
+                result.classList.remove('show');
+            }
+        });
+    });
+});
+
+// Update notification count
+function updateNotificationCount() {
+    fetch('/api/notifications/count')
+        .then(response => response.json())
+        .then(data => {
+            const badge = document.getElementById('notification-badge');
+            if (data.count > 0) {
+                badge.textContent = data.count;
+                badge.classList.remove('d-none');
+            } else {
+                badge.classList.add('d-none');
+            }
+        });
+}
+
+// Update notification count every minute
+setInterval(updateNotificationCount, 60000);
+updateNotificationCount();

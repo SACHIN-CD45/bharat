@@ -13,11 +13,13 @@
     <!-- Header -->
     <header class="header">
         <div class="d-flex align-items-center">
-            <button class="mobile-menu-toggle d-lg-none">
-                <i class="fas fa-bars"></i>
-            </button>
             <div class="d-none d-lg-block">
-                <h1 class="m-0 h4">Sachin Fitness</h1>
+                <h1 class="m-0 h4">IRONTRACK</h1>
+            </div>
+            <div class="search-container mx-3 my-3 d-lg-none">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="search-input" placeholder="Search members or trainers...">
+                <div class="search-results"></div>
             </div>
         </div>
 
@@ -51,13 +53,13 @@
 
     <div class="app-container">
         <!-- Sidebar -->
-        <aside class="sidebar">
+        <aside id="sidebar" class="sidebar d-none d-lg-block">
             <div class="sidebar-header d-lg-none">
-                <h1 class="sidebar-title">Sachin Fitness</h1>
+                <h1 class="sidebar-title">IRONTRACK</h1>
             </div>
             
             <!-- Global Search Bar -->
-            <div class="search-container mx-3 my-3">
+            <div class="search-container mx-3 my-3 d-none d-lg-block">
                 <i class="fas fa-search search-icon"></i>
                 <input type="text" class="search-input" placeholder="Search members or trainers...">
                 <div class="search-results"></div>
@@ -104,7 +106,7 @@
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-section">
-                <h5 class="footer-title">Sachin Fitness</h5>
+                <h5 class="footer-title">IRONTRACK</h5>
                 <p class="footer-description">Your trusted partner in fitness and health management. Transform your gym into a powerhouse of success.</p>
                 <div class="social-links">
                     <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
@@ -127,16 +129,16 @@
             <div class="footer-section">
                 <h5 class="footer-title">Contact Us</h5>
                 <ul class="footer-contact">
-                    <li><i class="fas fa-phone"></i> +91 123 456 7890</li>
-                    <li><i class="fas fa-envelope"></i> support@sachinfitness.com</li>
-                    <li><i class="fas fa-map-marker-alt"></i> 123 Fitness Street, Vadodara City, India</li>
+                    <li><i class="fas fa-phone"></i> +91-7004904661</li>
+                    <li><i class="fas fa-envelope"></i> sachinfitness@gmail.com</li>
+                    <li><i class="fas fa-map-marker-alt"></i> A2 kishan vintage, Vadodara City, India</li>
                 </ul>
             </div>
         </div>
         
         <div class="footer-bottom">
             <div class="footer-bottom-content">
-                <p>&copy; {{ current_year }} CollabCrew. All rights reserved.</p>
+                <p>&copy; {{ current_year }} IRONTRACK. All rights reserved.</p>
                 <div class="footer-bottom-links">
                     <a href="#">Privacy Policy</a>
                     <a href="#">Terms of Service</a>
@@ -146,72 +148,111 @@
         </div>
     </footer>
 
+    <!-- Bottom Navbar for Mobile View -->
+    <nav class="navbar fixed-bottom navbar-light bg-light d-lg-none">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('dashboard') }}">
+                <i class="fas fa-chart-line"></i>
+                <span>Dashboard</span>
+            </a>
+            <a class="navbar-brand" href="{{ url_for('members') }}">
+                <i class="fas fa-users"></i>
+                <span>Members</span>
+            </a>
+            <a class="navbar-brand" href="{{ url_for('trainers') }}">
+                <i class="fas fa-dumbbell"></i>
+                <span>Trainers</span>
+            </a>
+            <a class="navbar-brand" href="{{ url_for('settings') }}">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+        </div>
+    </nav>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script>
-        const searchInput = document.querySelector('.search-input');
-        const searchResults = document.querySelector('.search-results');
+        const searchInput = document.querySelectorAll('.search-input');
+        const searchResults = document.querySelectorAll('.search-results');
         let searchTimeout;
 
-        searchInput.addEventListener('input', function(e) {
-            clearTimeout(searchTimeout);
-            const query = e.target.value.trim();
-            
-            if (query.length < 1) {
-                searchResults.innerHTML = '';
-                searchResults.classList.remove('show');
-                return;
-            }
+        searchInput.forEach(input => {
+            input.addEventListener('input', function(e) {
+                clearTimeout(searchTimeout);
+                const query = e.target.value.trim();
+                
+                if (query.length < 1) {
+                    searchResults.forEach(result => {
+                        result.innerHTML = '';
+                        result.classList.remove('show');
+                    });
+                    return;
+                }
 
-            // Show loading state
-            searchResults.innerHTML = '<div class="search-result-empty">Searching...</div>';
-            searchResults.classList.add('show');
+                // Show loading state
+                searchResults.forEach(result => {
+                    result.innerHTML = '<div class="search-result-empty">Searching...</div>';
+                    result.classList.add('show');
+                });
 
-            searchTimeout = setTimeout(() => {
-                fetch(`/search?query=${encodeURIComponent(query)}`)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Search request failed');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        if (data.length > 0) {
-                            const html = data.map(item => `
-                                <a href="${item.url}" class="search-result-item">
-                                    <div class="d-flex align-items-center">
-                                        <div class="search-result-icon ${item.type === 'Member' ? 'bg-primary' : 'bg-success'}">
-                                            <i class="fas ${item.type === 'Member' ? 'fa-user' : 'fa-dumbbell'}"></i>
-                                        </div>
-                                        <div class="search-result-info">
-                                            <div class="search-result-name">${item.name}</div>
-                                            <div class="search-result-details">
-                                                ${item.type === 'Member' ? 
-                                                    `<span class="badge ${item.status === 'Active' ? 'bg-success' : 'bg-danger'}">${item.status}</span>` :
-                                                    `<span class="badge bg-info">${item.specialization || 'Trainer'}</span>`
-                                                }
-                                                <small class="text-muted">${item.phone}</small>
+                searchTimeout = setTimeout(() => {
+                    fetch(`/search?query=${encodeURIComponent(query)}`)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Search request failed');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.length > 0) {
+                                const html = data.map(item => `
+                                    <a href="${item.url}" class="search-result-item">
+                                        <div class="d-flex align-items-center">
+                                            <div class="search-result-icon ${item.type === 'Member' ? 'bg-primary' : 'bg-success'}">
+                                                <i class="fas ${item.type === 'Member' ? 'fa-user' : 'fa-dumbbell'}"></i>
+                                            </div>
+                                            <div class="search-result-info">
+                                                <div class="search-result-name">${item.name}</div>
+                                                <div class="search-result-details">
+                                                    ${item.type === 'Member' ? 
+                                                        `<span class="badge ${item.status === 'Active' ? 'bg-success' : 'bg-danger'}">${item.status}</span>` :
+                                                        `<span class="badge bg-info">${item.specialization || 'Trainer'}</span>`
+                                                    }
+                                                    <small class="text-muted">${item.phone}</small>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </a>
-                            `).join('');
-                            searchResults.innerHTML = html;
-                        } else {
-                            searchResults.innerHTML = '<div class="search-result-empty">No results found</div>';
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Search error:', error);
-                        searchResults.innerHTML = '<div class="search-result-empty text-danger">Error performing search</div>';
-                    });
-            }, 300);
+                                    </a>
+                                `).join('');
+                                searchResults.forEach(result => {
+                                    result.innerHTML = html;
+                                });
+                            } else {
+                                searchResults.forEach(result => {
+                                    result.innerHTML = '<div class="search-result-empty">No results found</div>';
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Search error:', error);
+                            searchResults.forEach(result => {
+                                result.innerHTML = '<div class="search-result-empty text-danger">Error performing search</div>';
+                            });
+                        });
+                }, 300);
+            });
         });
 
         // Hide search results when clicking outside
         document.addEventListener('click', function(e) {
-            if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
-                searchResults.classList.remove('show');
-            }
+            searchInput.forEach(input => {
+                searchResults.forEach(result => {
+                    if (!input.contains(e.target) && !result.contains(e.target)) {
+                        result.classList.remove('show');
+                    }
+                });
+            });
         });
 
         // Update notification count
@@ -232,12 +273,6 @@
         // Update notification count every minute
         setInterval(updateNotificationCount, 60000);
         updateNotificationCount();
-
-        
-
-        
-
-        
     </script>
     {% block extra_js %}{% endblock %}
 </body>
