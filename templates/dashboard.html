@@ -124,6 +124,9 @@
             </div>
         </div>
 
+        
+              
+
         <!-- Notifications -->
         <div class="col-md-4">
             <div class="card notifications-card">
@@ -159,7 +162,16 @@
             </div>
         </div>
     </div>
-</div>
+
+    <!-- <div class="earnings">
+        <h3>Monthly Earnings</h3>
+        <ul>
+            {% for month, earning in enumerate_list(earnings, start=1) %}
+                <li>{{ month }}: ${{ earning }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div> -->
 {% endblock %}
 
 {% block extra_js %}

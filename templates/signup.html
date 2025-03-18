@@ -69,6 +69,25 @@
         </div>
     </div>
 </div>
+<form action="{{ url_for('signup') }}" method="POST">
+    <!-- Existing signup fields (name, email, password, etc.) -->
+
+    <h3>Select Your Subscription Plan</h3>
+    <div>
+        <input type="radio" id="basic" name="plan" value="basic" required>
+        <label for="basic">Basic Plan - ₹19.99</label>
+    </div>
+    <div>
+        <input type="radio" id="standard" name="plan" value="standard" required>
+        <label for="standard">Standard Plan - ₹39.99</label>
+    </div>
+    <div>
+        <input type="radio" id="premium" name="plan" value="premium" required>
+        <label for="premium">Premium Plan - ₹59.99</label>
+    </div>
+    
+    <button type="submit">Sign Up</button>
+</form>
 
 <script>
 let video = document.getElementById('video');

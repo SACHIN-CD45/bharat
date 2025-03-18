@@ -41,6 +41,14 @@
                             </select>
                         </div>
                         
+                        <div class="mb-3">
+                            <label for="photo" class="form-label">Photo</label>
+                            <input type="file" class="form-control" id="photo" name="photo" accept="image/*" capture="camera">
+                            <video id="camera-stream" width="100%" autoplay></video>
+                            <button type="button" id="capture-button" class="btn btn-primary mt-2">Capture Photo</button>
+                            <canvas id="capture-canvas" style="display: none;"></canvas>
+                        </div>
+                        
                         <div class="text-end">
                             <a href="{{ url_for('trainers') }}" class="btn btn-light me-2">Cancel</a>
                             <button type="submit" class="btn btn-primary">
@@ -53,4 +61,5 @@
         </div>
     </div>
 </div>
+
 {% endblock %}

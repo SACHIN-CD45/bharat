@@ -1643,43 +1643,124 @@ body {
 }
 
 .footer {
-    background-color: var(--bg-secondary);
-    color: var(--text-primary);
-    padding: 3rem 0 0;
+    background-color: #f8f9fa;
+    padding: 20px 0;
+    border-top: 1px solid #e9ecef;
     position: relative;
     z-index: 1020;
-    margin-top: auto;
+    width: calc(100% - var(--sidebar-width));
+    margin-left: var(--sidebar-width);
 }
 
 .footer-content {
-    max-width:500px;
-    margin: 0 auto;
-    padding: 0 1rem;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 2rem;
-    
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
 }
 
 .footer-section {
-    padding: 0 1rem;
+    flex: 1;
+    min-width: 200px;
+}
+
+.footer-title {
+    font-size: 1.25rem;
+    margin-bottom: 10px;
+}
+
+.footer-description {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+.footer-contact,
+.footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-contact li,
+.footer-links li {
+    margin-bottom: 10px;
+    font-size: 0.875rem;
+}
+
+.footer-contact li i,
+.footer-links li i {
+    margin-right: 10px;
 }
 
 .footer-bottom {
-    margin-top: 3rem;
-    padding: 1.5rem 1rem;
-    border-top: 1px solid var(--border-color);
-    background-color: rgb(174, 174, 174);
+    background-color: #e9ecef;
+    padding: 10px 0;
+    text-align: center;
+    font-size: 0.875rem;
+    color: #6c757d;
 }
 
-.footer-bottom-content {
-    max-width: 500px;
-    margin: 0 auto;
+.footer-bottom-links {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 1rem;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.footer-bottom-links a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.footer-bottom-links a:hover {
+    text-decoration: underline;
+}
+
+.social-links {
+    display: flex;
+    gap: 10px;
+}
+
+.social-link {
+    color: #6c757d;
+    font-size: 1.25rem;
+}
+
+.social-link:hover {
+    color: #007bff;
+}
+
+.container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+        width: 100%;
+    }
+
+    .footer {
+        width: 100%;
+        margin-left: 0;
+    }
+
+    .footer-content {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .footer-section {
+        text-align: center;
+    }
+
+    .footer-bottom-links {
+        flex-direction: column;
+        gap: 5px;
+    }
 }
 
 /* Mobile Adjustments */
@@ -2165,7 +2246,7 @@ body {
 
 [data-theme="dark"] .status-badge.expired {
     background-color: rgba(248, 113, 113, 0.15);
-    color: var(--danger-color);
+    color: var (--danger-color);
 }
 
 /* Theme Toggle */
@@ -2488,4 +2569,167 @@ body {
         max-height: calc(100vh - var(--header-height));
         border-top: none;
     }
+}
+
+/* logo */
+
+/* Logo Styles */
+.logo {
+    height: 50px; /* Default height */
+    width: 50px; /* Ensure the logo is a square */
+    border-radius: 50%; /* Make the logo circular */
+    margin-right: 10px; /* Margin to separate from other elements */
+    object-fit: cover; /* Ensure the logo covers the entire area */
+}
+
+/* Adjust logo size for smaller screens */
+@media (max-width: 768px) {
+    .logo {
+        height: 40px; /* Smaller height for tablets and small screens */
+        width: 40px; /* Ensure the logo is a square */
+    }
+}
+
+@media (max-width: 576px) {
+    .logo {
+        height: 30px; /* Smaller height for mobile devices */
+        width: 30px; /* Ensure the logo is a square */
+    }
+}
+
+/* Center logo in mobile view if needed */
+@media (max-width: 576px) {
+    .header .d-flex {
+        justify-content: center; /* Center the logo in the header */
+    }
+}
+
+.navbar.fixed-bottom {
+    height: 50px; /* Reduce navbar height */
+    padding: 0; /* Remove extra padding */
+    display: flex;
+    align-items: center;
+}
+
+.navbar.fixed-bottom .container-fluid {
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+}
+
+.navbar.fixed-bottom .navbar-brand {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; /* Ensure proper vertical alignment */
+    text-align: center;
+    font-size: 0.8rem; /* Adjust text size */
+    padding: 0; /* Remove unnecessary padding */
+}
+
+.navbar.fixed-bottom .navbar-brand i {
+    font-size: 1.2rem; /* Adjust icon size */
+    line-height: 1; /* Prevent cropping */
+    margin-bottom: 2px; /* Adjust spacing */
+}
+
+.navbar.fixed-bottom .navbar-brand span {
+    font-size: 0.7rem; /* Adjust text size */
+    line-height: 1; /* Prevent cropping */
+}
+
+.payment-options {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.payment-options h2 {
+    margin-bottom: 15px;
+}
+
+.payment-options div {
+    margin: 10px 0;
+}
+
+.earnings-display {
+    background-color: #e9ecef;
+    padding: 20px;
+    border-radius: 5px;
+}
+
+.earnings-display h2 {
+    margin-bottom: 15px;
+}
+button {
+    background-color: #f44336; /* Red background */
+    color: white; /* White text */
+    border: none; /* No border */
+    padding: 10px 15px; /* Padding */
+    text-align: center; /* Centered text */
+    text-decoration: none; /* No underline */
+    display: inline-block; /* Inline block */
+    font-size: 16px; /* Font size */
+    margin: 4px 2px; /* Margin */
+    cursor: pointer; /* Pointer cursor on hover */
+    border-radius: 5px; /* Rounded corners */
+}
+
+button:hover {
+    background-color: #d32f2f; /* Darker red on hover */
+}
+
+.subscription-options {
+    margin-top: 20px;
+}
+
+.subscription-options h2 {
+    margin-bottom: 15px;
+}
+
+.subscription-options .form-check {
+    margin-bottom: 10px;
+}
+
+.navbar.fixed-bottom {
+    height: 50px; /* Reduce navbar height */
+    padding: 0; /* Remove extra padding */
+    display: flex;
+    align-items: center;
+}
+
+.navbar.fixed-bottom .container-fluid {
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+}
+
+.navbar.fixed-bottom .navbar-brand {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; /* Ensure proper vertical alignment */
+    text-align: center;
+    font-size: 0.8rem; /* Adjust text size */
+    padding: 0; /* Remove unnecessary padding */
+}
+
+.navbar.fixed-bottom .navbar-brand i {
+    font-size: 1.2rem; /* Adjust icon size */
+    line-height: 1; /* Prevent cropping */
+    margin-bottom: 2px; /* Adjust spacing */
+}
+
+.navbar.fixed-bottom .navbar-brand span {
+    font-size: 0.7rem; /* Adjust text size */
+    line-height: 1; /* Prevent cropping */
 }

@@ -106,8 +106,48 @@ def save_photo(photo_data):
 @app.route('/')
 def index():
     if current_user.is_authenticated:
-        return redirect(url_for('dashboard'))
+        user_data = mongo.db.gym_owners.find_one({'_id': ObjectId(current_user.id)})
+        if user_data.get('has_used_free_trial', False):
+            return redirect(url_for('dashboard'))
     return render_template('index.html')
+
+@app.route('/subscription')
+@login_required
+def subscription():
+    user_data = mongo.db.gym_owners.find_one({'_id': ObjectId(current_user.id)})
+    if user_data.get('has_used_free_trial', False):
+        return redirect(url_for('dashboard'))
+    return render_template('subscription.html')
+
+@app.route('/process_payment', methods=['POST'])
+@login_required
+def process_payment():
+    plan = request.form.get('subscription_plan')
+    if not plan:
+        return jsonify({'success': False, 'message': 'No plan selected'})
+
+    # Check if the user has already used the free trial
+    if plan == 'free_trial':
+        user_data = mongo.db.gym_owners.find_one({'_id': ObjectId(current_user.id)})
+        if user_data.get('has_used_free_trial', False):
+            return jsonify({'success': False, 'message': 'You have already used the free trial'})
+
+        # Mark the user as having used the free trial
+        mongo.db.gym_owners.update_one(
+            {'_id': ObjectId(current_user.id)},
+            {'$set': {'has_used_free_trial': True}}
+        )
+        return redirect(url_for('dashboard'))
+
+    # Here you would integrate with your payment gateway (e.g. Razorpay, PhonePe)
+    # For now, just return a success message
+    return jsonify({'success': True, 'message': 'Payment processed successfully'})
+
+@app.context_processor
+def utility_processor():
+    def enumerate_list(iterable, start=0):
+        return enumerate(iterable, start)
+    return dict(enumerate_list=enumerate_list)
 
 @app.route('/dashboard')
 @login_required
@@ -152,12 +192,27 @@ def dashboard():
     for notif in notifications:
         notif['_id'] = str(notif['_id'])
     
+    # Calculate monthly earnings
+    earnings = []
+    for month in range(1, 13):
+        start_date = datetime(now.year, month, 1)
+        end_date = datetime(now.year, month + 1, 1) if month < 12 else datetime(now.year + 1, 1, 1)
+        monthly_earnings = list(mongo.db.payments.aggregate([
+            {'$match': {
+                'gym_owner_id': ObjectId(current_user.id),
+                'payment_date': {'$gte': start_date, '$lt': end_date}
+            }},
+            {'$group': {'_id': None, 'total': {'$sum': '$amount'}}}
+        ]))
+        earnings.append(monthly_earnings[0]['total'] if monthly_earnings else 0)
+    
     return render_template('dashboard.html',
                          active_members=active_members,
                          expired_members=expired_members,
                          expiring_soon=expiring_soon,
                          members=recent_members,
                          notifications=notifications,
+                         earnings=earnings,
                          now=now)
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -171,6 +226,7 @@ def signup():
         password = request.form.get('password')
         name = request.form.get('name')
         photo_data = request.form.get('photo')
+        subscription_plan = request.form.get('subscription_plan')
         
         if mongo.db.gym_owners.find_one({'email': email}):
             flash('Email already registered', 'danger')
@@ -191,7 +247,8 @@ def signup():
             'password': hashed_password,
             'name': name or gym_name,  # Use gym name as fallback
             'photo': photo_url,
-            'created_at': datetime.utcnow()
+            'created_at': datetime.utcnow(),
+            'subscription_plan': subscription_plan  # Add subscription plan
         }
         
         result = mongo.db.gym_owners.insert_one(user_data)
@@ -401,12 +458,19 @@ def add_trainer():
         email = request.form.get('email')
         phone = request.form.get('phone')
         specialization = request.form.get('specialization')
+        photo_data = request.form.get('photo')
+        
+        # Process photo if provided
+        photo_filename = None
+        if photo_data:
+            photo_filename = save_photo(photo_data)
         
         trainer = {
             'name': name,
             'email': email,
             'phone': phone,
             'specialization': specialization,
+            'photo': photo_filename,
             'gym_owner_id': ObjectId(current_user.id),
             'created_at': datetime.utcnow()
         }
@@ -746,6 +810,38 @@ def update_trainer(trainer_id):
     
     return render_template('update_trainer.html', trainer=trainer)
 
+@app.route('/delete_member/<member_id>', methods=['POST'])
+@login_required
+def delete_member(member_id):
+    try:
+        result = mongo.db.members.delete_one({
+            '_id': ObjectId(member_id),
+            'gym_owner_id': ObjectId(current_user.id)
+        })
+        if result.deleted_count == 1:
+            flash('Member deleted successfully!', 'success')
+        else:
+            flash('Member not found or you do not have permission to delete this member.', 'danger')
+    except Exception as e:
+        flash(f'Error deleting member: {str(e)}', 'danger')
+    return redirect(url_for('members'))
+
+@app.route('/delete_trainer/<trainer_id>', methods=['POST'])
+@login_required
+def delete_trainer(trainer_id):
+    try:
+        result = mongo.db.trainers.delete_one({
+            '_id': ObjectId(trainer_id),
+            'gym_owner_id': ObjectId(current_user.id)
+        })
+        if result.deleted_count == 1:
+            flash('Trainer deleted successfully!', 'success')
+        else:
+            flash('Trainer not found or you do not have permission to delete this trainer.', 'danger')
+    except Exception as e:
+        flash(f'Error deleting trainer: {str(e)}', 'danger')
+    return redirect(url_for('trainers'))
+
 @app.route('/settings', methods=['GET', 'POST'])
 @login_required
 def settings():
@@ -755,6 +851,7 @@ def settings():
         current_password = request.form.get('current_password')
         new_password = request.form.get('new_password')
         photo_data = request.form.get('photo')
+        subscription_plan = request.form.get('subscription_plan')
         
         user_id = current_user.user_data['_id']
         update_data = {}
@@ -776,10 +873,13 @@ def settings():
         if current_password and new_password:
             if check_password_hash(current_user.user_data['password'], current_password):
                 update_data['password'] = generate_password_hash(new_password)
-                flash('Password updated successfully!', 'success')
             else:
-                flash('Current password is incorrect!', 'danger')
+                flash('Current password is incorrect', 'danger')
                 return redirect(url_for('settings'))
+        
+        # Update subscription plan
+        if subscription_plan:
+            update_data['subscription_plan'] = subscription_plan
         
         if update_data:
             mongo.db.gym_owners.update_one(
@@ -823,13 +923,68 @@ def profile():
     
     return render_template('profile.html')
 
+@app.route('/privacy_policy')
+def privacy_policy():
+    return render_template('privacy_policy.html')
+
+@app.route('/terms_conditions')
+def terms_conditions():
+    return render_template('terms_conditions.html')
+
+@app.route('/refund_cancellation_policy')
+def refund_cancellation_policy():
+    return render_template('refund_cancellation_policy.html')
+
+@app.route('/support')
+def support():
+    return render_template('support.html')
+
 @app.template_filter('format_date')
 def format_date(date):
     if isinstance(date, str):
         date = parse(date)
     return date.strftime('%Y-%m-%d %H:%M')
 
+@app.route('/select_subscription', methods=['GET', 'POST'])
+@login_required
+def select_subscription():
+    if request.method == 'POST':
+        subscription_plan = request.form.get('subscription_plan')
+        if subscription_plan not in ['Basic', 'Standard', 'Premium']:
+            flash('Invalid subscription plan selected', 'danger')
+            return redirect(url_for('select_subscription'))
+        
+        mongo.db.gym_owners.update_one(
+            {'_id': ObjectId(current_user.id)},
+            {'$set': {'subscription_plan': subscription_plan}}
+        )
+        
+        flash('Subscription plan updated successfully!', 'success')
+        return redirect(url_for('dashboard'))
+    
+    return render_template('select_subscription.html')
 
+@app.route('/trainer/<trainer_id>')
+@login_required
+def view_trainer(trainer_id):
+    try:
+        trainer = mongo.db.trainers.find_one({
+            '_id': ObjectId(trainer_id),
+            'gym_owner_id': ObjectId(current_user.id)
+        })
+        
+        if not trainer:
+            flash('Trainer not found.', 'danger')
+            return redirect(url_for('trainers'))
+        
+        # Convert ObjectId to string for template
+        trainer['_id'] = str(trainer['_id'])
+        
+        return render_template('view_trainer.html', trainer=trainer)
+                             
+    except Exception as e:
+        flash(f'Error viewing trainer details: {str(e)}', 'danger')
+        return redirect(url_for('trainers'))
 
 if __name__ == '__main__':
-    app.run(debug=True, port=7002, host='0.0.0.0')
+    app.run(debug=True, port=7001, host='0.0.0.0')

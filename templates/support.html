@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Support{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h1>Support</h1>
+    <p>If you have any questions or need assistance, please contact our support team. We are here to help you with any issues or inquiries you may have.</p>
+    
+    <h2>Contact Information</h2>
+    <ul>
+        <li><strong>Email:</strong> support@gymtrackme.com</li>
+        <li><strong>Phone:</strong> +91-7004904661</li>
+        <li><strong>Address:</strong> A2 Kishan Vintage, Vadodara City, India</li>
+    </ul>
+    
+    <h2>Frequently Asked Questions (FAQs)</h2>
+    <p>Check out our <a href="#">FAQ section</a> for answers to common questions.</p>
+    
+    <h2>Submit a Support Ticket</h2>
+    <p>If you need further assistance, please fill out the form below to submit a support ticket:</p>
+    <form method="POST" action="/submit_ticket">
+        <div class="mb-3">
+            <label for="name" class="form-label">Full Name</label>
+            <input type="text" class="form-control" id="name" name="name" required>
+        </div>
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email" required>
+        </div>
+        <div class="mb-3">
+            <label for="subject" class="form-label">Subject</label>
+            <input type="text" class="form-control" id="subject" name="subject" required>
+        </div>
+        <div class="mb-3">
+            <label for="message" class="form-label">Message</label>
+            <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
+        </div>
+        <div class="text-end">
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

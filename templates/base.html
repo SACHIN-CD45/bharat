@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
     {% block styles %}{% endblock %}
 </head>
 <body>
@@ -14,7 +15,10 @@
     <header class="header">
         <div class="d-flex align-items-center">
             <div class="d-none d-lg-block">
-                <h1 class="m-0 h4">IRONTRACK</h1>
+                <!-- <a href="{{ url_for('index') }}">
+                    <img src="{{ url_for('static', filename='img/logo.png')}}" alt="Logo" class="Logo">
+                </a> -->
+                <h1 class="m-0 h4">GYMTRACK</h1>
             </div>
             <div class="search-container mx-3 my-3 d-lg-none">
                 <i class="fas fa-search search-icon"></i>
@@ -55,7 +59,7 @@
         <!-- Sidebar -->
         <aside id="sidebar" class="sidebar d-none d-lg-block">
             <div class="sidebar-header d-lg-none">
-                <h1 class="sidebar-title">IRONTRACK</h1>
+                <h1 class="sidebar-title">GYMTRACK</h1>
             </div>
             
             <!-- Global Search Bar -->
@@ -106,7 +110,7 @@
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-section">
-                <h5 class="footer-title">IRONTRACK</h5>
+                <h5 class="footer-title">GYMTRACK</h5>
                 <p class="footer-description">Your trusted partner in fitness and health management. Transform your gym into a powerhouse of success.</p>
                 <div class="social-links">
                     <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
@@ -116,7 +120,7 @@
                 </div>
             </div>
             
-            <div class="footer-section">
+            <!-- <div class="footer-section">
                 <h5 class="footer-title">Quick Links</h5>
                 <ul class="footer-links">
                     <li><a href="{{ url_for('dashboard') }}"><i class="fas fa-chart-line"></i> Dashboard</a></li>
@@ -124,7 +128,7 @@
                     <li><a href="{{ url_for('trainers') }}"><i class="fas fa-dumbbell"></i> Trainers</a></li>
                     <li><a href="{{ url_for('settings') }}"><i class="fas fa-cog"></i> Settings</a></li>
                 </ul>
-            </div>
+            </div> -->
             
             <div class="footer-section">
                 <h5 class="footer-title">Contact Us</h5>
@@ -138,11 +142,12 @@
         
         <div class="footer-bottom">
             <div class="footer-bottom-content">
-                <p>&copy; {{ current_year }} IRONTRACK. All rights reserved.</p>
+                <p>&copy; {{ current_year }} GYMTRACK. All rights reserved.</p>
                 <div class="footer-bottom-links">
-                    <a href="#">Privacy Policy</a>
-                    <a href="#">Terms of Service</a>
-                    <a href="#">Support</a>
+                    <a href="{{ url_for('privacy_policy') }}">Privacy Policy</a>
+                    <a href="{{ url_for('terms_conditions') }}">Terms of Service</a>
+                    <a href="{{ url_for('refund_cancellation_policy') }}">Refund & Cancellation Policy</a>
+                    <a href="{{ url_for('support') }}">Support</a>
                 </div>
             </div>
         </div>
@@ -273,6 +278,52 @@
         // Update notification count every minute
         setInterval(updateNotificationCount, 60000);
         updateNotificationCount();
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const cameraInputs = document.querySelectorAll('input[type="file"][capture="camera"]');
+            cameraInputs.forEach(input => {
+                input.addEventListener('click', function() {
+                    navigator.mediaDevices.getUserMedia({ video: true })
+                        .then(stream => {
+                            stream.getTracks().forEach(track => track.stop());
+                        })
+                        .catch(err => {
+                            alert('Could not access camera. Please make sure you have granted camera permissions.');
+                        });
+                });
+            });
+
+            const video = document.getElementById('camera-stream');
+            const canvas = document.getElementById('capture-canvas');
+            const captureButton = document.getElementById('capture-button');
+
+            if (video && canvas && captureButton) {
+                navigator.mediaDevices.getUserMedia({ video: true })
+                    .then(stream => {
+                        video.srcObject = stream;
+                    })
+                    .catch(err => {
+                        console.error('Error accessing camera:', err);
+                    });
+
+                captureButton.addEventListener('click', function() {
+                    const context = canvas.getContext('2d');
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    const dataUrl = canvas.toDataURL('image/jpeg');
+                    document.getElementById('photo').value = dataUrl;
+                });
+            }
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                window.location.href = "{{ url_for('subscription') }}";
+            }, 60000); // Redirect after 1 minute (60000 milliseconds)
+        });
     </script>
     {% block extra_js %}{% endblock %}
 </body>

@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Subscription Plans{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm mb-4 bg-dark text-white">
+                <div class="card-header">
+                    <h5 class="mb-0">Choose Your Subscription Plan</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('process_payment') }}" class="needs-validation" novalidate>
+                        <!-- Subscription Options -->
+                        <h2>Subscription Plans</h2>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="subscription_plan" id="free_trial" value="free_trial" required>
+                                <label class="form-check-label" for="free_trial">
+                                    Free Trial - 1 Month (Access all features)
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="subscription_plan" id="one_month" value="one_month" required>
+                                <label class="form-check-label" for="one_month">
+                                    1 Month - ₹499
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="subscription_plan" id="three_months" value="three_months" required>
+                                <label class="form-check-label" for="three_months">
+                                    3 Months - ₹1299
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="subscription_plan" id="six_months" value="six_months" required>
+                                <label class="form-check-label" for="six_months">
+                                    6 Months - ₹1999
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="subscription_plan" id="one_year" value="one_year" required>
+                                <label class="form-check-label" for="one_year">
+                                    1 Year - ₹2999
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="text-end">
+                            <button type="submit" id="razorpay-button" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Pay with Razorpay
+                            </button>
+                            <button type="submit" id="phonepe-button" class="btn btn-secondary">
+                                <i class="fas fa-save me-2"></i>Pay with PhonePe
+                            </button>
+                        </div>
+                    </form>
+                    <div class="skip-trial mt-3">
+                        <button type="button" class="btn btn-light" onclick="skipTrial()">
+                            Skip 1 Month Trial
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function skipTrial() {
+    // Logic to handle skipping the trial
+    alert('You have chosen to skip the 1-month trial.');
+    // Redirect to the paid subscription plans
+    window.location.href = "{{ url_for('subscription') }}";
+}
+</script>
+{% endblock %}

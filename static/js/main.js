@@ -197,6 +197,80 @@ document.addEventListener('DOMContentLoaded', function() {
         updateNotificationBadge();
         setInterval(updateNotificationBadge, 30000); // Check every 30 seconds
     }
+    
+    const subscriptionOptions = document.querySelectorAll('input[name="subscription_plan"]');
+    const razorpayButton = document.getElementById('razorpay-button');
+    const phonepeButton = document.getElementById('phonepe-button');
+
+    function getSelectedPlanAmount() {
+        const selectedPlan = document.querySelector('input[name="subscription_plan"]:checked');
+        if (!selectedPlan) {
+            alert('Please select a subscription plan.');
+            return null;
+        }
+
+        let amount = 0;
+        switch (selectedPlan.value) {
+            case 'one_month':
+                amount = 49900; // Amount in paise
+                break;
+            case 'three_months':
+                amount = 129900;
+                break;
+            case 'six_months':
+                amount = 199900;
+                break;
+            case 'one_year':
+                amount = 299900;
+                break;
+            default:
+                alert('Invalid subscription plan selected.');
+                return null;
+        }
+        return amount;
+    }
+
+    razorpayButton.addEventListener('click', function() {
+        const amount = getSelectedPlanAmount();
+        if (amount === null) return;
+
+        const options = {
+            key: 'YOUR_RAZORPAY_KEY', // Replace with your Razorpay key
+            amount: amount,
+            currency: 'INR',
+            name: 'GYMTRACK',
+            description: 'Subscription Payment',
+            handler: function(response) {
+                alert('Payment successful. Payment ID: ' + response.razorpay_payment_id);
+                // Optionally, send the payment ID to your server for further processing
+            },
+            prefill: {
+                name: '{{ current_user.user_data.name }}',
+                email: '{{ current_user.user_data.email }}'
+            },
+            theme: {
+                color: '#F37254'
+            }
+        };
+
+        const rzp1 = new Razorpay(options);
+        rzp1.open();
+    });
+
+    phonepeButton.addEventListener('click', function() {
+        const amount = getSelectedPlanAmount();
+        if (amount === null) return;
+
+        // PhonePe payment integration logic
+        // This is a placeholder. Replace with actual PhonePe integration code.
+        alert('PhonePe payment integration is not yet implemented.');
+    });
+
+    subscriptionOptions.forEach(option => {
+        option.addEventListener('change', function() {
+            console.log(`Selected plan: ${this.value}`);
+        });
+    });
 });
 
 // Clean up on page unload
@@ -302,6 +376,64 @@ function updateNotificationCount() {
         });
 }
 
+document.getElementById('paymentForm').onsubmit = function(event) {
+    // You can add any additional validation or processing here before submission
+    alert('Payment plan selected: ' + document.querySelector('input[name="plan"]:checked').value);
+};
+
+// Example code to create a chart (using Chart.js)
+const ctx = document.getElementById('earningsChart').getContext('2d');
+const earningsChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: ['1 Month', '3 Months', '6 Months', '1 Year'],
+        datasets: [{
+            label: 'Earnings',
+            data: [29.99, 79.99, 139.99, 249.99], // Replace with dynamic data if needed
+            backgroundColor: 'rgba(75, 192, 192, 0.6)',
+            borderColor: 'rgba(75, 192, 192, 1)',
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+// payment
+document.getElementById('razorpay-button').onclick = function (e) {
+    var options = {
+        key: 'YOUR_RAZORPAY_KEY', // Enter the Key ID generated from the Dashboard
+        amount: 50000, // Amount is in currency subunits. Default is paise. Hence 50000 means ₹500.
+        currency: "INR",
+        name: "Your Website Name",
+        description: "Test Transaction",
+        image: "https://your-logo-url.com",
+        order_id: '', // Pass the order_id obtained from the server
+        handler: function (response) {
+            // Handle successful payment here
+            alert(response.razorpay_payment_id);
+            // Optionally, send the payment ID to your server for further processing
+        },
+        prefill: {
+            name: "Customer Name",
+            email: "customer@example.com",
+            contact: "9999999999"
+        },
+        notes: {
+            address: "Customer Address"
+        },
+        theme: {
+            color: "#F37254"
+        }
+    };
+    var rzp1 = new Razorpay(options);
+    rzp1.open();
+    e.preventDefault();
+};
 // Update notification count every minute
 setInterval(updateNotificationCount, 60000);
 updateNotificationCount();
