@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}{% endblock %} - Sachin Fitness</title>
+    <title>{% block title %}GYMTRACK{% endblock %} - Sachin Fitness</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     
     {% block styles %}{% endblock %}
 </head>
-<body>
+<body class="dark-page">
     <!-- Header -->
     <header class="header">
         <div class="d-flex align-items-center">
@@ -55,42 +55,52 @@
         </div>
     </header>
 
-    <div class="app-container">
+    <div class="app-container d-flex">
         <!-- Sidebar -->
-        <aside id="sidebar" class="sidebar d-none d-lg-block">
-            <div class="sidebar-header d-lg-none">
-                <h1 class="sidebar-title">GYMTRACK</h1>
+        <aside id="sidebar" class="sidebar bg-dark text-white vh-100 position-fixed">
+            <div class="sidebar-header p-3">
+                <h1 class="sidebar-title h4">GYMTRACK</h1>
             </div>
             
-            <!-- Global Search Bar -->
-            <div class="search-container mx-3 my-3 d-none d-lg-block">
-                <i class="fas fa-search search-icon"></i>
-                <input type="text" class="search-input" placeholder="Search members or trainers...">
-                <div class="search-results"></div>
-            </div>
-            
-            <nav class="sidebar-menu">
-                <a href="{{ url_for('dashboard') }}" class="sidebar-menu-item {{ 'active' if request.endpoint == 'dashboard' }}">
-                    <i class="fas fa-chart-line"></i>
-                    <span>Dashboard</span>
-                </a>
-                <a href="{{ url_for('members') }}" class="sidebar-menu-item {{ 'active' if request.endpoint == 'members' }}">
-                    <i class="fas fa-users"></i>
-                    <span>Members</span>
-                </a>
-                <a href="{{ url_for('trainers') }}" class="sidebar-menu-item {{ 'active' if request.endpoint == 'trainers' }}">
-                    <i class="fas fa-dumbbell"></i>
-                    <span>Trainers</span>
-                </a>
-                <a href="{{ url_for('settings') }}" class="sidebar-menu-item {{ 'active' if request.endpoint == 'settings' }}">
-                    <i class="fas fa-cog"></i>
-                    <span>Settings</span>
-                </a>
-            </nav>
+            {% if current_user.is_authenticated %}
+                {% if current_user.user_data.role == 'gym_owner' %}
+                    <!-- Sidebar for Gym Owners -->
+                    <nav class="sidebar-menu">
+                        <a href="{{ url_for('dashboard') }}" class="sidebar-menu-item {{ 'active' if request.endpoint == 'dashboard' }}">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Dashboard</span>
+                        </a>
+                        <a href="{{ url_for('members') }}" class="sidebar-menu-item {{ 'active' if request.endpoint == 'members' }}">
+                            <i class="fas fa-users"></i>
+                            <span>Members</span>
+                        </a>
+                        <a href="{{ url_for('trainers') }}" class="sidebar-menu-item {{ 'active' if request.endpoint == 'trainers' }}">
+                            <i class="fas fa-dumbbell"></i>
+                            <span>Trainers</span>
+                        </a>
+                        <a href="{{ url_for('admin_classes') }}" class="sidebar-menu-item {{ 'active' if request.endpoint == 'admin_classes' }}">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>Classes</span>
+                        </a>
+                        <a href="{{ url_for('admin_payments') }}" class="sidebar-menu-item {{ 'active' if request.endpoint == 'admin_payments' }}">
+                            <i class="fas fa-credit-card"></i>
+                            <span>Payments</span>
+                        </a>
+                        <a href="{{ url_for('admin_inventory') }}" class="sidebar-menu-item {{ 'active' if request.endpoint == 'admin_inventory' }}">
+                            <i class="fas fa-boxes"></i>
+                            <span>Inventory</span>
+                        </a>
+                        <a href="{{ url_for('settings') }}" class="sidebar-menu-item {{ 'active' if request.endpoint == 'settings' }}">
+                            <i class="fas fa-cog"></i>
+                            <span>Settings</span>
+                        </a>
+                    </nav>
+                {% endif %}
+            {% endif %}
         </aside>
 
         <!-- Main Content -->
-        <main class="main-content">
+        <main class="main-content ms-auto p-4" style="margin-left: 250px;">
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
                     {% for category, message in messages %}
@@ -106,74 +116,58 @@
         </main>
     </div>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="footer-content">
-            <div class="footer-section">
-                <h5 class="footer-title">GYMTRACK</h5>
-                <p class="footer-description">Your trusted partner in fitness and health management. Transform your gym into a powerhouse of success.</p>
-                <div class="social-links">
-                    <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
-                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
-                    <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
-                </div>
+    <!-- Bottom Navbar -->
+    {% if current_user.is_authenticated %}
+        <nav class="navbar fixed-bottom navbar-dark bg-dark d-lg-none">
+            <div class="container-fluid d-flex justify-content-around">
+                {% if current_user.user_data.role == 'gym_owner' %}
+                    <!-- Bottom Navbar for Gym Owners -->
+                    <a href="{{ url_for('dashboard') }}" class="text-white text-center">
+                        <i class="fas fa-chart-line"></i>
+                        <div>Dashboard</div>
+                    </a>
+                    <a href="{{ url_for('members') }}" class="text-white text-center">
+                        <i class="fas fa-users"></i>
+                        <div>Members</div>
+                    </a>
+                    <a href="{{ url_for('trainers') }}" class="text-white text-center">
+                        <i class="fas fa-dumbbell"></i>
+                        <div>Trainers</div>
+                    </a>
+                    <a href="{{ url_for('admin_classes') }}" class="text-white text-center">
+                        <i class="fas fa-calendar-alt"></i>
+                        <div>Classes</div>
+                    </a>
+                    <a href="{{ url_for('settings') }}" class="text-white text-center">
+                        <i class="fas fa-cog"></i>
+                        <div>Settings</div>
+                    </a>
+                {% elif current_user.user_data.role == 'normal' %}
+                    <!-- Bottom Navbar for Normal Users -->
+                    <a href="{{ url_for('user_panel') }}" class="text-white text-center">
+                        <i class="fas fa-user"></i>
+                        <div>Panel</div>
+                    </a>
+                    <a href="{{ url_for('view_blog', blog_id='latest') }}" class="text-white text-center">
+                        <i class="fas fa-blog"></i>
+                        <div>Blogs</div>
+                    </a>
+                    <a href="{{ url_for('view_article', article_id='latest') }}" class="text-white text-center">
+                        <i class="fas fa-newspaper"></i>
+                        <div>Articles</div>
+                    </a>
+                    <a href="{{ url_for('member_workout') }}" class="text-white text-center">
+                        <i class="fas fa-dumbbell"></i>
+                        <div>Workouts</div>
+                    </a>
+                    <a href="{{ url_for('member_progress') }}" class="text-white text-center">
+                        <i class="fas fa-chart-line"></i>
+                        <div>Progress</div>
+                    </a>
+                {% endif %}
             </div>
-            
-            <!-- <div class="footer-section">
-                <h5 class="footer-title">Quick Links</h5>
-                <ul class="footer-links">
-                    <li><a href="{{ url_for('dashboard') }}"><i class="fas fa-chart-line"></i> Dashboard</a></li>
-                    <li><a href="{{ url_for('members') }}"><i class="fas fa-users"></i> Members</a></li>
-                    <li><a href="{{ url_for('trainers') }}"><i class="fas fa-dumbbell"></i> Trainers</a></li>
-                    <li><a href="{{ url_for('settings') }}"><i class="fas fa-cog"></i> Settings</a></li>
-                </ul>
-            </div> -->
-            
-            <div class="footer-section">
-                <h5 class="footer-title">Contact Us</h5>
-                <ul class="footer-contact">
-                    <li><i class="fas fa-phone"></i> +91-7004904661</li>
-                    <li><i class="fas fa-envelope"></i> sachinfitness@gmail.com</li>
-                    <li><i class="fas fa-map-marker-alt"></i> A2 kishan vintage, Vadodara City, India</li>
-                </ul>
-            </div>
-        </div>
-        
-        <div class="footer-bottom">
-            <div class="footer-bottom-content">
-                <p>&copy; {{ current_year }} GYMTRACK. All rights reserved.</p>
-                <div class="footer-bottom-links">
-                    <a href="{{ url_for('privacy_policy') }}">Privacy Policy</a>
-                    <a href="{{ url_for('terms_conditions') }}">Terms of Service</a>
-                    <a href="{{ url_for('refund_cancellation_policy') }}">Refund & Cancellation Policy</a>
-                    <a href="{{ url_for('support') }}">Support</a>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Bottom Navbar for Mobile View -->
-    <nav class="navbar fixed-bottom navbar-light bg-light d-lg-none">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="{{ url_for('dashboard') }}">
-                <i class="fas fa-chart-line"></i>
-                <span>Dashboard</span>
-            </a>
-            <a class="navbar-brand" href="{{ url_for('members') }}">
-                <i class="fas fa-users"></i>
-                <span>Members</span>
-            </a>
-            <a class="navbar-brand" href="{{ url_for('trainers') }}">
-                <i class="fas fa-dumbbell"></i>
-                <span>Trainers</span>
-            </a>
-            <a class="navbar-brand" href="{{ url_for('settings') }}">
-                <i class="fas fa-cog"></i>
-                <span>Settings</span>
-            </a>
-        </div>
-    </nav>
+        </nav>
+    {% endif %}
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>

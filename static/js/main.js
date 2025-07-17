@@ -273,6 +273,40 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+document.addEventListener('DOMContentLoaded', function() {
+    const renewButton = document.querySelector('.renew-subscription button');
+    if (renewButton) {
+        renewButton.addEventListener('click', function() {
+            const selectedPlan = document.querySelector('input[name="subscription_plan"]:checked');
+            if (selectedPlan) {
+                const planValue = selectedPlan.value;
+                fetch('/process_payment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: `subscription_plan=${planValue}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        window.location.href = '/dashboard';
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while processing your request.');
+                });
+            } else {
+                alert('Please select a subscription plan to renew.');
+            }
+        });
+    }
+});
+
 // Clean up on page unload
 window.addEventListener('beforeunload', function() {
     if (currentStream) {

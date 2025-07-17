@@ -3,149 +3,83 @@
 {% block title %}Sign Up - Gym Management System{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-md-8 offset-md-2">
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="mb-0">Create Your Gym Account</h4>
-                </div>
-                <div class="card-body">
-                    <form method="POST" action="{{ url_for('signup') }}" enctype="multipart/form-data">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg">
+                <div class="row g-0">
+                    <!-- Role Selection Sidebar -->
+                    <div class="col-md-4 bg-primary text-white d-flex flex-column justify-content-center align-items-center">
+                        <h4 class="text-center mb-3">Sign Up As</h4>
+                        <button class="btn btn-light w-75 mb-2" id="gym-owner-btn">Gym Owner</button>
+                        <button class="btn btn-light w-75" id="normal-user-btn">Normal User</button>
+                    </div>
+                    <!-- Signup Form -->
+                    <div class="col-md-8">
+                        <div class="card-body">
+                            <h4 class="card-title text-center mb-4">Create Your Account</h4>
+                            <form method="POST" action="{{ url_for('signup') }}" enctype="multipart/form-data">
+                                <input type="hidden" id="role" name="role" value="gym_owner">
+                                <div class="mb-3" id="gym-name-group">
                                     <label for="gym_name" class="form-label">Gym Name</label>
-                                    <input type="text" class="form-control" id="gym_name" name="gym_name" required>
+                                    <input type="text" class="form-control" id="gym_name" name="gym_name" placeholder="Enter your gym name">
                                 </div>
-                                
                                 <div class="mb-3">
                                     <label for="name" class="form-label">Your Name</label>
                                     <input type="text" class="form-control" id="name" name="name" required>
                                 </div>
-                                
                                 <div class="mb-3">
                                     <label for="email" class="form-label">Email</label>
                                     <input type="email" class="form-control" id="email" name="email" required>
                                 </div>
-                                
                                 <div class="mb-3">
                                     <label for="password" class="form-label">Password</label>
                                     <input type="password" class="form-control" id="password" name="password" required>
                                 </div>
-                            </div>
-                            
-                            <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label class="form-label">Profile Photo</label>
-                                    <div class="camera-container">
-                                        <video id="video" width="320" height="240" class="mb-2 d-none"></video>
-                                        <canvas id="canvas" width="320" height="240" class="mb-2 d-none"></canvas>
-                                        <img id="photo-preview" class="mb-2 d-none" width="320" height="240">
-                                        <div class="d-flex gap-2">
-                                            <button type="button" id="start-camera" class="btn btn-primary">
-                                                <i class="fas fa-camera me-2"></i>Take Photo
-                                            </button>
-                                            <button type="button" id="capture-photo" class="btn btn-success d-none">
-                                                <i class="fas fa-camera-retro me-2"></i>Capture
-                                            </button>
-                                            <button type="button" id="retake-photo" class="btn btn-warning d-none">
-                                                <i class="fas fa-redo me-2"></i>Retake
-                                            </button>
-                                        </div>
-                                        <input type="hidden" name="photo" id="photo-data">
-                                    </div>
+                                    <label for="photo" class="form-label">Profile Photo</label>
+                                    <input type="file" class="form-control" id="photo" name="photo">
                                 </div>
-                            </div>
+                                <div class="text-end">
+                                    <a href="{{ url_for('login') }}" class="btn btn-link">Already have an account?</a>
+                                    <button type="submit" class="btn btn-primary">Sign Up</button>
+                                </div>
+                            </form>
                         </div>
-                        
-                        <div class="text-end mt-3">
-                            <a href="{{ url_for('login') }}" class="btn btn-light me-2">Already have an account?</a>
-                            <button type="submit" class="btn btn-primary">Create Account</button>
-                        </div>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<form action="{{ url_for('signup') }}" method="POST">
-    <!-- Existing signup fields (name, email, password, etc.) -->
-
-    <h3>Select Your Subscription Plan</h3>
-    <div>
-        <input type="radio" id="basic" name="plan" value="basic" required>
-        <label for="basic">Basic Plan - ₹19.99</label>
-    </div>
-    <div>
-        <input type="radio" id="standard" name="plan" value="standard" required>
-        <label for="standard">Standard Plan - ₹39.99</label>
-    </div>
-    <div>
-        <input type="radio" id="premium" name="plan" value="premium" required>
-        <label for="premium">Premium Plan - ₹59.99</label>
-    </div>
-    
-    <button type="submit">Sign Up</button>
-</form>
 
 <script>
-let video = document.getElementById('video');
-let canvas = document.getElementById('canvas');
-let startButton = document.getElementById('start-camera');
-let captureButton = document.getElementById('capture-photo');
-let retakeButton = document.getElementById('retake-photo');
-let photoPreview = document.getElementById('photo-preview');
-let photoData = document.getElementById('photo-data');
-let stream = null;
+document.addEventListener('DOMContentLoaded', function() {
+    const roleInput = document.getElementById('role');
+    const gymNameGroup = document.getElementById('gym-name-group');
+    const gymOwnerBtn = document.getElementById('gym-owner-btn');
+    const normalUserBtn = document.getElementById('normal-user-btn');
 
-startButton.addEventListener('click', async () => {
-    try {
-        stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        video.srcObject = stream;
-        video.play();
-        
-        video.classList.remove('d-none');
-        captureButton.classList.remove('d-none');
-        startButton.classList.add('d-none');
-        photoPreview.classList.add('d-none');
-    } catch (err) {
-        console.error('Error accessing camera:', err);
-        alert('Could not access camera. Please make sure you have granted camera permissions.');
-    }
-});
+    gymOwnerBtn.addEventListener('click', function() {
+        roleInput.value = 'gym_owner';
+        gymNameGroup.style.display = 'block';
+        gymOwnerBtn.classList.add('btn-dark');
+        gymOwnerBtn.classList.remove('btn-light');
+        normalUserBtn.classList.add('btn-light');
+        normalUserBtn.classList.remove('btn-dark');
+    });
 
-captureButton.addEventListener('click', () => {
-    canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-    const photoDataUrl = canvas.toDataURL('image/jpeg');
-    
-    photoPreview.src = photoDataUrl;
-    photoData.value = photoDataUrl;
-    
-    video.classList.add('d-none');
-    photoPreview.classList.remove('d-none');
-    captureButton.classList.add('d-none');
-    retakeButton.classList.remove('d-none');
-    
-    if (stream) {
-        stream.getTracks().forEach(track => track.stop());
-    }
-});
+    normalUserBtn.addEventListener('click', function() {
+        roleInput.value = 'normal';
+        gymNameGroup.style.display = 'none';
+        normalUserBtn.classList.add('btn-dark');
+        normalUserBtn.classList.remove('btn-light');
+        gymOwnerBtn.classList.add('btn-light');
+        gymOwnerBtn.classList.remove('btn-dark');
+    });
 
-retakeButton.addEventListener('click', async () => {
-    try {
-        stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        video.srcObject = stream;
-        video.play();
-        
-        video.classList.remove('d-none');
-        captureButton.classList.remove('d-none');
-        retakeButton.classList.add('d-none');
-        photoPreview.classList.add('d-none');
-    } catch (err) {
-        console.error('Error accessing camera:', err);
-        alert('Could not access camera. Please make sure you have granted camera permissions.');
-    }
+    // Set initial state
+    gymOwnerBtn.click();
 });
 </script>
 {% endblock %}

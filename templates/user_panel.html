@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}User Panel{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h1 class="text-center mb-4">Welcome to Your Panel</h1>
+    
+    <div class="row">
+        <!-- Articles Section -->
+        <div class="col-md-6 mb-4">
+            <h3>Articles</h3>
+            <ul class="list-group">
+                {% for article in articles %}
+                <li class="list-group-item">
+                    <a href="{{ url_for('view_article', article_id=article['_id']) }}">{{ article['title'] }}</a>
+                </li>
+                {% else %}
+                <li class="list-group-item text-muted">No articles available.</li>
+                {% endfor %}
+            </ul>
+        </div>
+        
+        <!-- Blogs Section -->
+        <div class="col-md-6 mb-4">
+            <h3>Blogs</h3>
+            <ul class="list-group">
+                {% for blog in blogs %}
+                <li class="list-group-item">
+                    <a href="{{ url_for('view_blog', blog_id=blog['_id']) }}">{{ blog['title'] }}</a>
+                </li>
+                {% else %}
+                <li class="list-group-item text-muted">No blogs available.</li>
+                {% endfor %}
+            </ul>
+        </div>
+        
+        <!-- Diet Charts Section -->
+        <div class="col-md-6 mb-4">
+            <h3>Diet Charts</h3>
+            <ul class="list-group">
+                {% for chart in diet_charts %}
+                <li class="list-group-item">
+                    <a href="{{ url_for('view_diet_chart', chart_id=chart['_id']) }}">{{ chart['name'] }}</a>
+                </li>
+                {% else %}
+                <li class="list-group-item text-muted">No diet charts available.</li>
+                {% endfor %}
+            </ul>
+        </div>
+        
+        <!-- Workout Videos Section -->
+        <div class="col-md-6 mb-4">
+            <h3>Workout Videos</h3>
+            <ul class="list-group">
+                {% for video in workout_videos %}
+                <li class="list-group-item">
+                    <a href="{{ video['url'] }}" target="_blank">{{ video['title'] }}</a>
+                </li>
+                {% else %}
+                <li class="list-group-item text-muted">No workout videos available.</li>
+                {% endfor %}
+            </ul>
+        </div>
+        
+        <!-- Workout Tracking Section -->
+        <div class="col-md-12 mb-4">
+            <h3>Workout Tracking</h3>
+            <ul class="list-group">
+                {% for tracking in workout_tracking %}
+                <li class="list-group-item">
+                    {{ tracking['date'] }}: {{ tracking['details'] }}
+                </li>
+                {% else %}
+                <li class="list-group-item text-muted">No workout tracking data available.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

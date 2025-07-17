@@ -2,12 +2,19 @@ body.dark-page {
     background-color: #121212;
     color: #ffffff;
     font-family: Arial, sans-serif;
+    perspective: 1000px; /* Add perspective for 3D effect */
 }
 
 .subscription-container {
     text-align: center;
     margin: 50px auto;
     max-width: 600px;
+    transform: rotateY(10deg); /* Rotate for 3D effect */
+    transition: transform 0.5s; /* Smooth transition */
+}
+
+.subscription-container:hover {
+    transform: rotateY(0deg); /* Reset rotation on hover */
 }
 
 .plan {
@@ -16,6 +23,12 @@ body.dark-page {
     border-radius: 10px;
     padding: 20px;
     margin: 20px 0;
+    transform: translateZ(50px); /* Move forward in 3D space */
+    transition: transform 0.5s; /* Smooth transition */
+}
+
+.plan:hover {
+    transform: translateZ(100px); /* Move further forward on hover */
 }
 
 .plan h2 {
@@ -60,6 +73,12 @@ body.dark-page {
 .card.bg-dark {
     background-color: #1e1e1e;
     border: 1px solid #333;
+    transform: translateZ(30px); /* Move forward in 3D space */
+    transition: transform 0.5s; /* Smooth transition */
+}
+
+.card.bg-dark:hover {
+    transform: translateZ(60px); /* Move further forward on hover */
 }
 
 .card-header {
@@ -83,4 +102,22 @@ body.dark-page {
 .btn-light:hover {
     background-color: #3700b3;
     color: #ffffff;
+}
+
+/* New styles for header and GYMTRACK */
+.header {
+    background-color: #6200ea;
+    color: #ffffff;
+    padding: 20px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+.header .gymtrack {
+    color: #bb86fc;
+    font-size: 32px;
+    font-weight: bold;
+    text-shadow: 2px 2px #3700b3;
 }

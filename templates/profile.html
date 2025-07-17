@@ -59,6 +59,22 @@
                                     <input type="email" class="form-control" value="{{ current_user.user_data.email }}" readonly>
                                     <small class="text-muted">To change email, go to Settings</small>
                                 </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Subscription Status</label>
+                                    {% if current_user.user_data.subscription_end %}
+                                        <p>
+                                            {% set days_remaining = (current_user.user_data.subscription_end - now).days %}
+                                            {% if days_remaining > 0 %}
+                                                Active - {{ days_remaining }} days remaining
+                                            {% else %}
+                                                Expired
+                                            {% endif %}
+                                        </p>
+                                    {% else %}
+                                        <p>No subscription</p>
+                                    {% endif %}
+                                </div>
                             </div>
                         </div>
                         
@@ -99,7 +115,17 @@ startButton.addEventListener('click', async () => {
         }
     } catch (err) {
         console.error('Error accessing camera:', err);
-        alert('Could not access camera. Please make sure you have granted camera permissions.');
+        if (err.name === 'NotAllowedError') {
+            alert('Camera access was denied. Please grant permissions in your browser settings.');
+        } else if (err.name === 'NotFoundError') {
+            alert('No camera found on this device.');
+        } else if (err.name === 'NotReadableError') {
+            alert('The camera is already in use by another application.');
+        } else if (err.name === 'OverconstrainedError') {
+            alert('The requested camera constraints cannot be satisfied by the available hardware.');
+        } else {
+            alert('Could not access camera. Please make sure you have granted camera permissions.');
+        }
     }
 });
 

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Panel{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h1 class="text-center mb-4">Admin Panel</h1>
+    <form method="POST" action="{{ url_for('admin_panel') }}">
+        <div class="mb-3">
+            <label for="content_type" class="form-label">Content Type</label>
+            <select class="form-select" id="content_type" name="content_type" required>
+                <option value="blog">Blog</option>
+                <option value="article">Article</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="title" class="form-label">Title</label>
+            <input type="text" class="form-control" id="title" name="title" required>
+        </div>
+        <div class="mb-3">
+            <label for="content" class="form-label">Content</label>
+            <textarea class="form-control" id="content" name="content" rows="5" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Post Content</button>
+    </form>
+</div>
+{% endblock %}
